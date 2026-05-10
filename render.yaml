@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: free
     buildCommand: bundle install
-    startCommand: bundle exec puma -C config/puma.rb
+    startCommand: bundle exec puma -t 5:5 -C config/puma.rb
     
     # Auto-deploy on git push
     autoDeploy: false
@@ -29,8 +29,8 @@ services:
         value: correio-da-manha
       - key: RAILS_LOG_LEVEL
         value: info
-      - key: RAILS_SERVE_STATIC_FILES
-        value: true
+      - key: WEB_CONCURRENCY
+        value: 0
 
 databases:
   - name: cm-analytics-db
