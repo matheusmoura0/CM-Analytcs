@@ -24,7 +24,3 @@ plugin :tmp_restart
 
 # Preload app for performance
 preload_app!
-
-# Max requests per worker (optional, helps with memory leaks)
-max_requests_count = ENV.fetch("RAILS_MAX_REQUESTS") { 1000 }.to_i
-max_requests max_requests_count
