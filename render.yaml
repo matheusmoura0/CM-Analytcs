@@ -5,7 +5,7 @@ services:
     env: ruby
     region: oregon
     plan: free
-    buildCommand: bundle install && bundle exec rails assets:precompile
+    buildCommand: bundle install
     startCommand: bundle exec puma -C config/puma.rb
     
     # Auto-deploy on git push
@@ -21,26 +21,19 @@ services:
         fromDatabase:
           name: cm-analytics-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: cm-analytics-redis
-          property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://www.correiodamanha.com.br,https://correiodamanha.com.br,https://cm-analytics.onrender.com
       - key: APP_HOST
         value: cm-analytics.onrender.com
       - key: DEFAULT_SITE_ID
         value: correio-da-manha
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: RAILS_SERVE_STATIC_FILES
+        value: true
 
 databases:
   - name: cm-analytics-db
     databaseName: cm_analytics_production
     user: cm_analytics
     plan: free # Neon PostgreSQL free tier
-
-# Optional: Redis for Sidekiq (if needed in future)
-# - type: redis
-#   name: cm-analytics-redis
-#   plan: free
-#   maxmemoryPolicy: allkeys-lru
