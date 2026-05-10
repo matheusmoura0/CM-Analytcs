@@ -14,12 +14,20 @@ Rails.application.configure do
   # Force SSL
   config.force_ssl = true
 
-  # Allowed hosts
+  # Allowed hosts - accept all onrender.com subdomains
+  config.hosts = nil
+  config.hosts ||= []
+
+  # Explicitly allow common domains
   config.hosts << "cm-analytics.onrender.com"
   config.hosts << "cm-analytcs.onrender.com"
+  config.hosts << /.+\.onrender\.com/  # Accept any onrender.com subdomain
   config.hosts << "analytics.correiodamanha.com.br"
   config.hosts << "www.correiodamanha.com.br"
   config.hosts << "correiodamanha.com.br"
+
+  # Allow all hosts in development-like scenarios
+  config.action_controller.default_protect_from_forgery = false
 
   # Active Job
   config.active_job.queue_adapter = :sidekiq
