@@ -1,0 +1,103 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900 flex items-center">
+      <span class="text-3xl mr-2">📱</span>
+      Google Discover Dashboard
+    </h1>
+    <p class="mt-1 text-gray-600">Análise de performance no Google Discover</p>
+  </div>
+
+  <!-- Discover Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+      <p class="text-sm font-medium opacity-90">Impressões (7d)</p>
+      <p class="text-3xl font-bold mt-2"><%= format_number(DiscoverMetric.for_date_range(7.days.ago.to_date, Date.today).sum(:impressions)) %></p>
+    </div>
+
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+      <p class="text-sm font-medium opacity-90">Cliques (7d)</p>
+      <p class="text-3xl font-bold mt-2"><%= format_number(DiscoverMetric.for_date_range(7.days.ago.to_date, Date.today).sum(:clicks)) %></p>
+    </div>
+
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+      <p class="text-sm font-medium opacity-90">CTR Médio</p>
+      <p class="text-3xl font-bold mt-2"><%= format_percent(DiscoverMetric.for_date_range(7.days.ago.to_date, Date.today).average(:ctr)) %></p>
+    </div>
+
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
+      <p class="text-sm font-medium opacity-90">Artigos em Discover</p>
+      <p class="text-3xl font-bold mt-2"><%= format_number(DiscoverMetric.for_date_range(7.days.ago.to_date, Date.today).distinct.count(:article_id)) %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Discover Trend -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">📈 Tendência Discover (7 dias)</h2>
+      <% trend_data = DiscoverMetric.for_date_range(7.days.ago.to_date, Date.today).group(:date).sum(:clicks) %>
+      <%= line_chart trend_data, library: { options: { plugins: { legend: { display: false } } } } %>
+    </div>
+
+    <!-- Top Discover Articles -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">🏆 Top Artigos Discover</h2>
+      <div class="space-y-3">
+        <% @top_discover.each do |metric| %>
+          <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+            <div class="flex-1">
+              <p class="font-medium text-gray-900"><%= metric.cached_article&.title || "Artigo ##{metric.article_id}" %></p>
+              <p class="text-sm text-gray-500">CTR: <%= format_percent(metric.ctr) %></p>
+            </div>
+            <div class="text-right">
+              <span class="text-xl font-bold text-green-600"><%= format_number(metric.clicks) %></span>
+              <p class="text-xs text-gray-500">cliques</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Discover Metrics Table -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">📊 Métricas Detalhadas</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Artigo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Impressões</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliques</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CTR</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @discover_metrics.first(20).each do |metric| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900"><%= metric.cached_article&.title || "Artigo ##{metric.article_id}" %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"><%= format_number(metric.impressions) %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-blue-600"><%= format_number(metric.clicks) %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= metric.ctr >= 5 ? 'bg-green-100 text-green-800' : metric.ctr >= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800' %>">
+                  <%= format_percent(metric.ctr) %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= metric.date.strftime('%d/%m/%Y') %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

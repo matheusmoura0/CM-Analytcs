@@ -1,0 +1,117 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Editorial Dashboard</h1>
+    <p class="mt-1 text-gray-600">Análise de performance de conteúdo e autores</p>
+  </div>
+
+  <!-- Date Filter -->
+  <div class="mb-6 flex items-center space-x-4">
+    <%= form_tag editorial_dashboard_path, method: :get, class: "flex items-center space-x-2" do %>
+      <%= date_field_tag :start_date, @start_date, class: "border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500" %>
+      <span class="text-gray-500">até</span>
+      <%= date_field_tag :end_date, @end_date, class: "border border-gray-300 rounded-lg px-3 py-2 focus:ring-red-500 focus:border-red-500" %>
+      <%= submit_tag "Filtrar", class: "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg" %>
+    <% end %>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-lg shadow p-6">
+      <p class="text-sm font-medium text-gray-500">Total Page Views</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= format_number(AnalyticsEvent.by_date_range(@start_date, @end_date).page_views.count) %></p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <p class="text-sm font-medium text-gray-500">Artigos Únicos</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= format_number(AnalyticsEvent.by_date_range(@start_date, @end_date).page_views.distinct.count(:article_id)) %></p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <p class="text-sm font-medium text-gray-500">Tempo Médio</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= AnalyticsEvent.by_date_range(@start_date, @end_date).where.not(time_on_page: nil).average(:time_on_page).to_i %>s</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <p class="text-sm font-medium text-gray-500">Scroll até 100%</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= format_percent(AnalyticsEvent.by_date_range(@start_date, @end_date).scroll_events.where(scroll_depth: 100).count.to_f / AnalyticsEvent.by_date_range(@start_date, @end_date).page_views.count * 100) %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Top Articles -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">📰 Top Artigos</h2>
+      <div class="space-y-3">
+        <% @top_articles.each do |article| %>
+          <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+            <div class="flex-1">
+              <p class="font-medium text-gray-900"><%= article[:title] %></p>
+              <p class="text-sm text-gray-500"><%= article[:author] %> · <%= article[:section] %></p>
+            </div>
+            <div class="text-right">
+              <span class="text-xl font-bold text-red-600"><%= format_number(article[:views]) %></span>
+              <p class="text-xs text-gray-500">views</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Top Authors -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">✍️ Top Autores</h2>
+      <div class="space-y-3">
+        <% @top_authors.each do |author, count| %>
+          <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+            <div class="flex-1">
+              <p class="font-medium text-gray-900"><%= author %></p>
+            </div>
+            <div class="text-right">
+              <span class="text-xl font-bold text-blue-600"><%= format_number(count) %></span>
+              <p class="text-xs text-gray-500">views</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Top Sections -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">📂 Top Secções</h2>
+      <%= column_chart @top_sections, library: { options: { plugins: { legend: { display: false } } } } %>
+      
+      <div class="mt-4 space-y-2">
+        <% @top_sections.sort_by { |k, v| -v }.first(5).each do |section, count| %>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600"><%= section %></span>
+            <span class="font-medium text-gray-900"><%= format_number(count) %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Homepage CTR -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">🏠 Homepage Performance</h2>
+      <div class="space-y-4">
+        <% if @homepage_clicks.present? %>
+          <% @homepage_clicks.each do |position, count| %>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700"><%= position %></span>
+                <span class="text-sm text-gray-500"><%= format_number(count) %> cliques</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-red-600 h-2 rounded-full" style="width: <%= (count.to_f / @homepage_clicks.values.max * 100).to_i %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-gray-500 text-sm">Sem dados de cliques na homepage</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

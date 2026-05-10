@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= @page_title || "CM Analytics" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
+  </head>
+
+  <body class="bg-gray-50">
+    <% if @current_user %>
+      <nav class="bg-red-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="flex justify-between items-center h-16">
+            <div class="flex items-center space-x-8">
+              <h1 class="text-xl font-bold cursor-pointer" onclick="window.location.href='/'">CM Analytics</h1>
+              <div class="hidden md:flex space-x-4">
+                <%= link_to 'Dashboard', dashboard_path, class: nav_class('index') %>
+                <%= link_to 'Real-time', realtime_dashboard_path, class: nav_class('realtime') %>
+                <%= link_to 'Editorial', editorial_dashboard_path, class: nav_class('editorial') %>
+                <%= link_to 'Discover', discover_dashboard_path, class: nav_class('discover') %>
+                <% if @current_user.admin? %>
+                  <%= link_to 'Monetization', monetization_dashboard_path, class: nav_class('monetization') %>
+                <% end %>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span class="text-sm"><%= @current_user.name %></span>
+              <span class="px-2 py-1 bg-red-600 rounded text-xs uppercase"><%= @current_user.role %></span>
+              <%= button_to 'Logout', logout_path, method: :post, class: "bg-red-600 hover:bg-red-800 px-4 py-2 rounded text-sm cursor-pointer" %>
+            </div>
+          </div>
+        </div>
+      </nav>
+    <% end %>
+
+    <main class="<%= @current_user ? 'py-6' : '' %>">
+      <%= yield %>
+    </main>
+  </body>
+</html>
