@@ -71,3 +71,4 @@ Thumbs.db
 
 # Ignore vendor/bundle
 /vendor/bundle
+config/master.key
