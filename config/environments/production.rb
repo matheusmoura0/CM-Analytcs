@@ -9,7 +9,6 @@ Rails.application.configure do
   config.assets.compress = true
   config.log_level = :info
   config.log_tags = [ :request_id ]
-  config.action_mailer.perform_caching = false
   config.i18n.fallbacks = true
   config.active_support.report_deprecations = false
   config.log_formatter = ::Logger::Formatter.new
@@ -25,12 +24,4 @@ Rails.application.configure do
 
   # Active Job
   config.active_job.queue_adapter = :sidekiq
-
-  # CORS allowed origins
-  config.allowed_cors_origins = [
-    "https://www.correiodamanha.com.br",
-    "https://correiodamanha.com.br",
-    "https://cm-analytics.onrender.com",
-    "http://localhost:3000"
-  ]
 end
