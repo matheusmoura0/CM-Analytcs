@@ -7,10 +7,10 @@ services:
     plan: free
     buildCommand: bundle install
     startCommand: bundle exec puma -t 5:5 -C config/puma.rb
-    
+
     # Auto-deploy on git push
     autoDeploy: false
-    
+
     # Environment Variables
     envVars:
       - key: RAILS_ENV
@@ -22,7 +22,7 @@ services:
           name: cm-analytics-db
           property: connectionString
       - key: ALLOWED_ORIGINS
-        value: https://www.correiodamanha.com.br,https://correiodamanha.com.br,https://cm-analytics.onrender.com
+        value: https://www.correiodamanha.com.br,https://correiodamanha.com.br,https://cm-analytics.onrender.com,https://cm-analytcs.onrender.com
       - key: APP_HOST
         value: cm-analytics.onrender.com
       - key: DEFAULT_SITE_ID

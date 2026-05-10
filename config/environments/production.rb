@@ -13,9 +13,10 @@ Rails.application.configure do
 
   # Force SSL
   config.force_ssl = true
-  
+
   # Allowed hosts
   config.hosts << "cm-analytics.onrender.com"
+  config.hosts << "cm-analytcs.onrender.com"
   config.hosts << "analytics.correiodamanha.com.br"
   config.hosts << "www.correiodamanha.com.br"
   config.hosts << "correiodamanha.com.br"
