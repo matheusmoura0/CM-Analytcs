@@ -1,9 +1,8 @@
 module Api
   module V1
     class AnalyticsController < ApplicationController
+      skip_before_action :set_current_user, only: [:create, :batch]
       skip_before_action :verify_authenticity_token
-      skip_before_action :authenticate_user!
-      before_action :validate_event_payload, only: [:create]
       
       def create
         event_params = extract_event_params
@@ -41,12 +40,6 @@ module Api
       end
       
       private
-      
-      def validate_event_payload
-        return if params[:event].present? || params[:events].present?
-        
-        render json: { error: 'Event data required' }, status: :bad_request
-      end
       
       def extract_event_params
         base_params = {
