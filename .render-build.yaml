@@ -1,0 +1,3 @@
+# Override Render's default Rails build
+buildCommand: bundle install
+skipAssetsPrecompile: true
