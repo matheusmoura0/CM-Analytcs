@@ -147,7 +147,7 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.19.5)
+    json (2.19.7)
     jwt (3.1.2)
       base64
     kamal (2.11.0)
@@ -350,7 +350,7 @@ GEM
     sidekiq-scheduler (6.0.2)
       rufus-scheduler (~> 3.2)
       sidekiq (>= 7.3, < 9)
-    solid_cable (3.0.12)
+    solid_cable (4.0.0)
       actioncable (>= 7.2)
       activejob (>= 7.2)
       activerecord (>= 7.2)
@@ -391,7 +391,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.7.5)
+    zeitwerk (2.8.2)
 
 PLATFORMS
   aarch64-linux
